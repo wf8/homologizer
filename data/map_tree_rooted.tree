@@ -1,0 +1,4 @@
+#NEXUS
+begin trees;
+	tree TREE1 = [&R] ((((((((C_membranifolia_6732:0.006317,C_tasmanica_6379_B:0.006953):0.002216,xCystocarpium_7974_A:0.007789):0.002831,(C_tasmanica_6379_A:0.010977,xCystocarpium_7974_D:0.008324):0.001601):0.003276,(C_protrusa_6359a:0.003714,C_protrusa_6359b:0.003219):0.00897):0.003686,C_moupinensis_4861:0.009466):0.00372,(C_bulbifera_7650a:0.002703,C_bulbifera_7650b:0.002552):0.007568):0.008599,(A_japonica_7978:0.004865,A_tenuisecta_sp1_4831:0.004957):0.015838):0.010659,(((G_appalachianum_7800:9.02E-4,xCystocarpium_7974_B:7.52E-4):0.002781,(G_oyamense_sp1_6399a:0.002935,G_oyamense_sp1_6399b:0.002695):0.008835):0.00114,xCystocarpium_7974_C:0.006729):0.010659);
+end;

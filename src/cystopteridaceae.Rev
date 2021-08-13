@@ -1,0 +1,145 @@
+#
+# Specifies a homologizer model that jointly infer the phase and phylogeny.
+# Run an MCMC analysis by default. Set bayes_factors = TRUE to calculate
+# the marginal likelihood with a stepping stone analysis.
+#
+# Will Freyman
+#
+bayes_factors = FALSE
+output_file = "output/homologizer"
+
+# input sequence alignments
+alignments = ["data/APP.nex",
+              "data/GAP.nex",
+              "data/IBR.nex",
+              "data/PGI.nex"]
+num_loci = alignments.size()
+
+for (i in 1:num_loci) {
+    data[i] = readDiscreteCharacterData(alignments[i])
+}
+
+# add blank second IBR gene copy for C_tasmanica_6379
+data[3].addMissingTaxa("6379_copy2")
+
+# set initial phase
+for (i in 1:num_loci) {
+    data[i].setHomeologPhase("6379_copy1", "C_tasmanica_6379_A")
+    data[i].setHomeologPhase("6379_copy2", "C_tasmanica_6379_B")
+    data[i].setHomeologPhase("7974_copy1", "xCystocarpium_7974_A")
+    data[i].setHomeologPhase("7974_copy2", "xCystocarpium_7974_B")
+    data[i].setHomeologPhase("7974_copy3", "xCystocarpium_7974_C")
+    data[i].setHomeologPhase("7974_copy4", "xCystocarpium_7974_D")
+    # for the 3-tip phasing model uncomment these lines:
+    #data[i].addMissingTaxa("6379_BLANK3")
+    #data[i].setHomeologPhase("6379_BLANK3", "C_tasmanica_6379_C")
+}
+
+# add missing taxa
+for (i in 1:num_loci) {
+    for (j in 1:num_loci) {
+        data[i].addMissingTaxa(data[j].taxa())
+    }
+}
+
+num_tips = data[1].ntaxa()
+n_branches = 2 * num_tips - 3
+
+# set up branches
+mvi = 0
+for (i in 1:n_branches) {
+    branch_lengths[i] ~ dnExponential(100)
+    moves[++mvi] = mvScale(branch_lengths[i], weight=1.0)
+}
+
+# set up tree topology
+topology ~ dnUniformTopology(data[1].taxa())
+moves[++mvi] = mvNNI(topology, weight=40.0)
+moves[++mvi] = mvSPR(topology, weight=40.0)
+
+# combine branches and topology into tree
+tree := treeAssembly(topology, branch_lengths)
+
+# substitution models
+for (i in 1:num_loci) {
+    
+    # gtr for each locus
+    er_prior <- v(1,1,1,1,1,1)
+    er[i] ~ dnDirichlet(er_prior)
+    er[i].setValue(simplex(v(1,1,1,1,1,1)))
+    moves[++mvi] = mvSimplexElementScale(er[i], weight=5)
+
+    pi_prior <- v(1,1,1,1)
+    pi[i] ~ dnDirichlet(pi_prior)
+    pi[i].setValue(simplex(v(1,1,1,1)))
+    moves[++mvi] = mvSimplexElementScale(pi[i], weight=5)
+
+    Q[i] := fnGTR(er[i], pi[i])
+
+    if (i == 1) {
+        rate_multiplier[i] <- 1.0
+    } else {
+        rate_multiplier[i] ~ dnExponential(1)
+        moves[++mvi] = mvScale(rate_multiplier[i], weight=5)
+    }
+
+}
+
+# phylogenetic CTMC distributions for each locus
+for (i in 1:num_loci) {
+    ctmc[i] ~ dnPhyloCTMC(tree=tree, Q=Q[i], branchRates=rate_multiplier[i], type="DNA")
+    ctmc[i].clamp(data[i])  
+}
+
+
+# make phasing proposals
+for (i in 1:4) {
+    moves[++mvi] = mvHomeologPhase(ctmc[i], "C_tasmanica_6379_A", "C_tasmanica_6379_B", weight=2)
+    moves[++mvi] = mvHomeologPhase(ctmc[i], "xCystocarpium_7974_A", "xCystocarpium_7974_B", weight=2)
+    moves[++mvi] = mvHomeologPhase(ctmc[i], "xCystocarpium_7974_A", "xCystocarpium_7974_C", weight=2)
+    moves[++mvi] = mvHomeologPhase(ctmc[i], "xCystocarpium_7974_A", "xCystocarpium_7974_D", weight=2)
+    moves[++mvi] = mvHomeologPhase(ctmc[i], "xCystocarpium_7974_B", "xCystocarpium_7974_C", weight=2)
+    moves[++mvi] = mvHomeologPhase(ctmc[i], "xCystocarpium_7974_B", "xCystocarpium_7974_D", weight=2)
+    moves[++mvi] = mvHomeologPhase(ctmc[i], "xCystocarpium_7974_C", "xCystocarpium_7974_D", weight=2)
+    # for the 3-tip phasing model uncomment these lines:
+    #moves[++mvi] = mvHomeologPhase(ctmc[i], "C_tasmanica_6379_A", "C_tasmanica_6379_B", weight=2)
+    #moves[++mvi] = mvHomeologPhase(ctmc[i], "C_tasmanica_6379_A", "C_tasmanica_6379_C", weight=2)
+    #moves[++mvi] = mvHomeologPhase(ctmc[i], "C_tasmanica_6379_B", "C_tasmanica_6379_C", weight=2)
+}
+
+mymodel = model(Q)
+
+
+# set up monitors
+mni = 0
+monitors[++mni] = mnModel(filename=output_file + ".log", printgen=1)
+monitors[++mni] = mnFile(filename=output_file + ".trees", printgen=1, tree)
+monitors[++mni] = mnScreen(printgen=1)
+for (i in 1:num_loci){
+    monitors[++mni] = mnHomeologPhase(filename=output_file + "_locus_" + i + "_phase.log", printgen=1, ctmc[i])
+}
+
+if (bayes_factors) {
+
+    # running stepping stone analysis
+    pow_p = powerPosterior(mymodel, moves, monitors, output_file + ".out", cats=50, sampleFreq=1) 
+    pow_p.burnin(generations=200, tuningInterval=50)
+    #pow_p.run(generations=2000)  
+    pow_p.run(generations=1000)  
+    ss = steppingStoneSampler(file=output_file + ".out", powerColumnName="power", likelihoodColumnName="likelihood")
+
+    # print the marginal likelihood to screen
+    print(ss.marginal())
+
+} else {
+
+    # run MCMC 
+    mymcmc = mcmc(mymodel, monitors, moves)
+    #mymcmc.run(generations=10000)
+    mymcmc.run(generations=2000)
+
+    # summarize results
+    treetrace = readTreeTrace(output_file + ".trees", treetype="non-clock", burnin=0.25) 
+    map_tree = mapTree(treetrace, output_file + "_map.tree")
+    mcc_tree = mccTree(treetrace, output_file + "_mcc.tree")
+}
