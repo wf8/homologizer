@@ -3,7 +3,7 @@ genecopyFn='data/cystopteridaceae_genomes.csv'
 tree_file = 'data/map_tree_rooted.tree'
 input_dir = 'output/'
 output_dir = 'output/'
-prefix = 'output/'
+prefix = 'output/homologizer'
 
 library(ggplot2)
 library(plyr)
@@ -187,7 +187,7 @@ for (sample in names(samples)) {
   joint_results = data.frame()
   for (i in 1:length(loci)) {
     # read in file and exclude burnin
-    f_in = paste0(prefix, '_gene',i, '_phase.log')
+    f_in = paste0(prefix, '_locus_',i, '_phase.log')
     d = read.csv(f_in, sep='\t',stringsAsFactors = TRUE,row.names=1)
     d = d[floor(nrow(d)*burnin):nrow(d),]
     

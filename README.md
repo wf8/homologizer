@@ -80,6 +80,11 @@ Detailed tutorials on these other aspects of `RevBayes` can be found at [http://
 
 ### Setting up the analysis
 
+Below we'll step through the code for this analysis line by line. However, if you have downloaded the data and script from
+the git repo [http://github.com/wf8/homologizer/](http://github.com/wf8/homologizer/)
+you can run the full analysis by typing `rb src/cystopteridaceae.Rev` in your terminal window
+from the `homologizer` directory.
+
 Our first step is to define a vector that holds the input sequence 
 alignment files, one for each locus.
 ```R
@@ -337,7 +342,7 @@ maximum *a posteriori* (MAP) tree:
 map_tree = mapTree(treetrace, output_file + "_map.tree")
 ```
 This command creates the tree file 
-`output/homologizer\_map.tree` that you can plot in [APE](https://cran.r-project.org/web/packages/ape/index.html) 
+`output/homologizer_map.tree` that you can plot in [APE](https://cran.r-project.org/web/packages/ape/index.html) 
 or [FigTree](http://tree.bio.ed.ac.uk/software/figtree/).
 Since we estimated an unrooted tree, you should use one of these tools
 to root the tree correctly and save a copy of the rooted tree that
@@ -348,6 +353,10 @@ estimates can be summarized and plotted
 using `R`. 
 For this tutorial we provide a script `src/plot_phase.R`
 to generate the figure below.
+After running the MCMC, if you have downloaded the data and scripts from
+the git repo [http://github.com/wf8/homologizer/](http://github.com/wf8/homologizer/)
+you can run the plotting script by typing `Rscript src/plot_phase.R` in your terminal window
+from the `homologizer` directory.
 This script can be easily adapted to work for other datasets; see the comments within the script.
 This plotting functionality will soon be more widely available as part of the 
 `RevGadgets` package (Tribble et al. 2021).
