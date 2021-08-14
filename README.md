@@ -25,7 +25,7 @@ The second example analysis uses `homologizer` to test whether the observed
 gene copies of one of the allopolyploids are homeologs from distinct
 subgenomes or allelic variants arising from the same subgenome.
 We provide the [data](http://github.com/wf8/homologizer/data) and the full [scripts](http://github.com/wf8/homologizer/src) 
-required to run these examples are found in the repo at
+required to run these examples in the repo at
 [http://github.com/wf8/homologizer/](http://github.com/wf8/homologizer/). 
 
 ### The `homologizer` model
