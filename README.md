@@ -24,7 +24,7 @@ to phase gene copies into the subgenomes of a set of allopolyploids.
 The second example analysis uses `homologizer` to test whether the observed
 gene copies of one of the allopolyploids are homeologs from distinct
 subgenomes or allelic variants arising from the same subgenome.
-We provide the [data](http://github.com/wf8/homologizer/data) and the full [scripts](http://github.com/wf8/homologizer/src) 
+We provide the [data](https://github.com/wf8/homologizer/tree/main/data/) and the full [scripts](https://github.com/wf8/homologizer/tree/main/src/) 
 required to run these examples in the repo at
 [http://github.com/wf8/homologizer/](http://github.com/wf8/homologizer/). 
 
