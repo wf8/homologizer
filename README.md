@@ -2,6 +2,9 @@
 
 # Phasing gene copies into polyploid subgenomes using `homologizer`
 
+
+[![DOI](https://zenodo.org/badge/395804027.svg)](https://zenodo.org/badge/latestdoi/395804027)
+
 *Will Freyman (willfreyman@gmail.com)*  
 *Carl Rothfels (crothfels@berkeley.edu)*
 
@@ -11,7 +14,7 @@ The tutorial is an abbreviated version of a soon-to-be published paper in Method
 Please see that paper for many more details and practical considerations for running `homologizer` analyses.
 If you use `homologizer`, please cite the paper in which we first describe the method:
 
-- Freyman, W.A., Johnson, M.G., and C.J. Rothfels. 2020. Homologizer: phylogenetic phasing of gene copies into polyploid subgenomes. *bioRxiv*
+- Freyman, W.A., Johnson, M.G., and C.J. Rothfels. 2022. Homologizer: phylogenetic phasing of gene copies into polyploid subgenomes. *bioRxiv* [2020.10.22.351486v4](https://www.biorxiv.org/content/10.1101/2020.10.22.351486v4)
 
 `homologizer` is implemented in `RevBayes`. Please see [http://revbayes.com](http://revbayes.com) to download and install `RevBayes`. 
 For users without previous `RevBayes` experience, we recommend the tutorials at [http://revbayes.com](http://revbayes.com).
