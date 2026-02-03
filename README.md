@@ -225,12 +225,9 @@ Our sequence evolution models are continuous-time Markov chains (CTMC) over
 the phylogeny. So we pass a GTR rate matrices `Q`,
 a `rate_multiplier`,
 and the `tree` into a phylogenetic CTMC distribution, one for each locus.
-We fix the value of the CTMC to our observed sequence data
-using the `clamp` function.
 ```R
 for (i in 1:num_loci) {
     ctmc[i] ~ dnPhyloCTMC(tree=tree, Q=Q[i], branchRates=rate_multiplier[i], type="DNA")
-    ctmc[i].clamp(data[i])  
 }
 ```
 We now have fully defined our phylogenetic model, 
@@ -264,6 +261,13 @@ for (i in 1:num_loci) {
     moves[++mvi] = mvHomeologPhase(ctmc[i], "xCystocarpium_7974_B", "xCystocarpium_7974_C", weight=2)
     moves[++mvi] = mvHomeologPhase(ctmc[i], "xCystocarpium_7974_B", "xCystocarpium_7974_D", weight=2)
     moves[++mvi] = mvHomeologPhase(ctmc[i], "xCystocarpium_7974_C", "xCystocarpium_7974_D", weight=2)
+}
+```
+We fix the value of each CTMC to the observed sequence data for each locus
+using the `clamp` function:
+```R
+for (i in 1:num_loci) {
+    ctmc[i].clamp(data[i])
 }
 ```
 Finally, we need to set up some monitors to
